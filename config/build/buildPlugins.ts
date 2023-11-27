@@ -3,6 +3,9 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import { BuildOptions } from "./types";
 import { buildGlobalEnvKeys } from "./BuildEnv";
+// import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 export function buildPlugins(options: BuildOptions): Configuration["plugins"] {
   const globalEnvKeys = buildGlobalEnvKeys(options.globalEnv);
@@ -28,6 +31,10 @@ export function buildPlugins(options: BuildOptions): Configuration["plugins"] {
         chunkFilename: "css/[name].[contenthash:8].css",
       }),
     );
+  }
+
+  if (options.analyzer) {
+    plugins.push(new BundleAnalyzerPlugin());
   }
 
   return plugins;

@@ -1,4 +1,4 @@
-import { GlobalEnvVariables } from "./env.types";
+import { GlobalEnvVariables, ScriptEnvVariables } from "./env.types";
 
 export type BuildPort = number;
 
@@ -11,11 +11,10 @@ export interface BuildPaths {
 
 export type BuildMode = "production" | "development";
 
-export interface BuildOptions {
+export interface BuildOptions extends ScriptEnvVariables {
   globalEnv: GlobalEnvVariables;
   port: BuildPort;
   paths: BuildPaths;
-  mode: BuildMode;
   isDev: boolean;
   isProd: boolean;
 }

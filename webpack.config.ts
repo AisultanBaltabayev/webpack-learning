@@ -1,7 +1,11 @@
 import path from "path";
 import { Configuration } from "webpack";
 import { buildWebpack } from "./config/build/buildWebpack";
-import { BuildMode, BuildPaths } from "./config/build/types";
+import {
+  BuildMode,
+  BuildPaths,
+  ScriptEnvVariables,
+} from "./config/build/types";
 import { buildGlobalEnv } from "./config/build/BuildEnv";
 
 export const BuildEnums: Record<BuildMode, BuildMode> = {
@@ -9,7 +13,7 @@ export const BuildEnums: Record<BuildMode, BuildMode> = {
   production: "production",
 };
 
-export default (scriptEnv: { mode: BuildMode }) => {
+export default (scriptEnv: ScriptEnvVariables) => {
   const mode = scriptEnv.mode ?? BuildEnums.development;
 
   const paths: BuildPaths = {
@@ -30,6 +34,7 @@ export default (scriptEnv: { mode: BuildMode }) => {
     isDev,
     isProd,
     paths,
+    analyzer: scriptEnv.analyzer,
   });
 
   return config;
