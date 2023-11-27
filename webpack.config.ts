@@ -26,7 +26,7 @@ export default (scriptEnv: { mode: Mode }) => {
     // мод для сборки 'production' || 'development'
     mode: mode,
     // путь где лежит файлик входа
-    entry: path.resolve(__dirname, "src", "index.ts"),
+    entry: path.resolve(__dirname, "src", "index.tsx"),
     output: {
       // путь где будет лежать сборка
       path: path.resolve(__dirname, "build"),
@@ -52,6 +52,7 @@ export default (scriptEnv: { mode: Mode }) => {
     module: {
       rules: [
         {
+          // ts-loader по дефолту умеет работать с JSX
           test: /\.tsx?$/,
           use: "ts-loader",
           exclude: /node_modules/,

@@ -4,7 +4,8 @@
     "noImplicitAny": true,
     "module": "ESNext",
     "target": "es5",
-    "jsx": "react",
+    // нужен для работы с jsx
+    "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "node",
     // esModuleInterop позволяет работать с пакетами, которые используют
