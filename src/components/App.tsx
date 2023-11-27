@@ -1,5 +1,5 @@
-import "./App.scss";
 import { useState } from "react";
+import classes from "./App.module.scss";
 
 interface AppProps {}
 
@@ -11,15 +11,8 @@ const App = (props: AppProps) => {
   };
   return (
     <div>
-      <h1
-      // className={classes.value}
-      >
-        {count}
-      </h1>
-      <button
-        // className={classes.button}
-        onClick={increment}
-      >
+      <h1 className={classes.value}>{count}</h1>
+      <button className={classes.button} onClick={increment}>
         <span>+1</span>
       </button>
     </div>
