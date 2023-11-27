@@ -7,6 +7,7 @@ export interface BuildPaths {
   output: string;
   html: string;
   env: string;
+  src: string;
 }
 
 export type BuildMode = "production" | "development";

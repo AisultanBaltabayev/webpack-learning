@@ -21,6 +21,7 @@ export default (scriptEnv: ScriptEnvVariables) => {
     output: path.resolve(__dirname, "build"),
     html: path.resolve(__dirname, "public", "index.html"),
     env: path.join(__dirname, `.env.${mode}`),
+    src: path.resolve(__dirname, "src"),
   };
 
   const globalEnv = buildGlobalEnv(paths.env);

@@ -2,8 +2,8 @@ import React, { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./components/App";
-import { AboutPageLazy } from "./pages/about";
-import { StorePageLazy } from "./pages/shop";
+import { AboutPageLazy } from "@/pages/about";
+import { StorePageLazy } from "@/pages/shop";
 
 const root = document.getElementById("root");
 

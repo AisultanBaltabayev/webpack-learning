@@ -15,7 +15,11 @@
     // лоадеры вроде ts-loader или babel-loader автоматически создают их
     // вместо import * as path from 'path';
     // можно писать import path from 'path';
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "ts-node": {
     "compilerOptions": {
