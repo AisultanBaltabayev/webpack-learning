@@ -3,6 +3,7 @@ import webpack from "webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import type { Configuration } from "webpack";
 import type { Configuration as DevServerConfiguration } from "webpack-dev-server";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 type Mode = "production" | "development";
 
@@ -16,6 +17,7 @@ export default (scriptEnv: { mode: Mode }) => {
   const mode = scriptEnv.mode;
   const { globalEnv, globalEnvKeys } = getGlobalEnv(mode);
   const isDev = mode === "development";
+  const isProd = mode === "production";
 
   const devServer: DevServerConfiguration = {
     port: globalEnv.PORT ?? 3000,
@@ -48,9 +50,25 @@ export default (scriptEnv: { mode: Mode }) => {
       }),
       // медленный плагин для проды
       isDev && new webpack.ProgressPlugin(),
+      isProd &&
+        new MiniCssExtractPlugin({
+          filename: "css/[name].[contenthash:8].css",
+          chunkFilename: "css/[name].[contenthash:8].css",
+        }),
     ].filter(Boolean),
     module: {
       rules: [
+        {
+          test: /\.s[ac]ss$/i,
+          use: [
+            // Creates `style` nodes from JS strings
+            isDev ? "style-loader" : MiniCssExtractPlugin.loader,
+            // Translates CSS into CommonJS
+            "css-loader",
+            // Compiles Sass to CSS
+            "sass-loader",
+          ],
+        },
         {
           // ts-loader по дефолту умеет работать с JSX
           test: /\.tsx?$/,
