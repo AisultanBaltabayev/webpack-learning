@@ -3,6 +3,34 @@ import { ModuleOptions } from "webpack";
 import { BuildOptions } from "./types";
 
 export function buildLoaders(options: BuildOptions): ModuleOptions["rules"] {
+  const assetLoader = {
+    test: /\.(png|jpg|jpeg|gif)$/i,
+    type: "asset/resource",
+  };
+
+  // преобразует SVG в React компоненты
+  const svgrLoader = {
+    test: /\.svg$/i,
+    use: [
+      {
+        loader: "@svgr/webpack",
+        options: {
+          icon: true,
+          svgoConfig: {
+            plugins: [
+              {
+                name: "convertColors",
+                params: {
+                  currentColor: true,
+                },
+              },
+            ],
+          },
+        },
+      },
+    ],
+  };
+
   const cssLoaderWithModules = {
     loader: "css-loader",
     options: {
@@ -33,5 +61,5 @@ export function buildLoaders(options: BuildOptions): ModuleOptions["rules"] {
     exclude: /node_modules/,
   };
 
-  return [scssLoader, tsLoader];
+  return [assetLoader, svgrLoader, scssLoader, tsLoader];
 }
