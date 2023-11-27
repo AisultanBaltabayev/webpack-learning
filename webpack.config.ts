@@ -1,110 +1,36 @@
 import path from "path";
-import webpack from "webpack";
-import HtmlWebpackPlugin from "html-webpack-plugin";
-import type { Configuration } from "webpack";
-import type { Configuration as DevServerConfiguration } from "webpack-dev-server";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import { Configuration } from "webpack";
+import { buildWebpack } from "./config/build/buildWebpack";
+import { BuildMode, BuildPaths } from "./config/build/types";
+import { buildGlobalEnv } from "./config/build/BuildEnv";
 
-type Mode = "production" | "development";
+export const BuildEnums: Record<BuildMode, BuildMode> = {
+  development: "development",
+  production: "production",
+};
 
-interface GlobalEnvVariables {
-  MODE: Mode;
-  PORT: number;
-}
+export default (scriptEnv: { mode: BuildMode }) => {
+  const mode = scriptEnv.mode ?? BuildEnums.development;
 
-export default (scriptEnv: { mode: Mode }) => {
-  console.log("scriptEnv.mode: ", scriptEnv.mode);
-  const mode = scriptEnv.mode;
-  const { globalEnv, globalEnvKeys } = getGlobalEnv(mode);
-  const isDev = mode === "development";
-  const isProd = mode === "production";
-
-  const devServer: DevServerConfiguration = {
-    port: globalEnv.PORT ?? 3000,
-    open: true,
-  };
-
-  const config: Configuration = {
-    // мод для сборки 'production' || 'development'
-    mode: mode,
-    // путь где лежит файлик входа
+  const paths: BuildPaths = {
     entry: path.resolve(__dirname, "src", "index.tsx"),
-    output: {
-      // путь где будет лежать сборка
-      path: path.resolve(__dirname, "build"),
-      // наименования файлика сборки.
-      // name default = 'main'.
-      // contenthash = хэш сгенерированный от содержимого файлика.
-      // Меняет хэш если меняется содержимое
-      filename: "[name].[contenthash].js",
-      // очистка кешированных файликов
-      clean: true,
-    },
-    plugins: [
-      // new webpack.DefinePlugin({
-      //   "process.env": globalEnv,
-      // }),
-      new webpack.DefinePlugin(globalEnvKeys),
-      new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, "public", "index.html"),
-      }),
-      // медленный плагин для проды
-      isDev && new webpack.ProgressPlugin(),
-      isProd &&
-        new MiniCssExtractPlugin({
-          filename: "css/[name].[contenthash:8].css",
-          chunkFilename: "css/[name].[contenthash:8].css",
-        }),
-    ].filter(Boolean),
-    module: {
-      rules: [
-        {
-          test: /\.s[ac]ss$/i,
-          use: [
-            // Creates `style` nodes from JS strings
-            isDev ? "style-loader" : MiniCssExtractPlugin.loader,
-            // Translates CSS into CommonJS
-            "css-loader",
-            // Compiles Sass to CSS
-            "sass-loader",
-          ],
-        },
-        {
-          // ts-loader по дефолту умеет работать с JSX
-          test: /\.tsx?$/,
-          use: "ts-loader",
-          exclude: /node_modules/,
-        },
-      ],
-    },
-    resolve: {
-      extensions: [".tsx", ".ts", ".js"],
-    },
-    devtool: isDev ? "inline-source-map" : false,
-    devServer: isDev ? devServer : undefined,
+    output: path.resolve(__dirname, "build"),
+    html: path.resolve(__dirname, "public", "index.html"),
+    env: path.join(__dirname, `.env.${mode}`),
   };
+
+  const globalEnv = buildGlobalEnv(paths.env);
+  const isDev = mode === BuildEnums.development;
+  const isProd = mode === BuildEnums.production;
+
+  const config: Configuration = buildWebpack({
+    globalEnv,
+    port: globalEnv.PORT ?? 3000,
+    mode,
+    isDev,
+    isProd,
+    paths,
+  });
 
   return config;
 };
-
-type GlobalEnvKeys = Record<string, any>;
-function getGlobalEnv(mode: Mode): {
-  globalEnv: GlobalEnvVariables;
-  globalEnvKeys: GlobalEnvKeys;
-} {
-  const dotenv = require("dotenv").config({
-    path: path.join(__dirname, `.env.${mode}`),
-  });
-
-  const globalEnv = dotenv.parsed;
-
-  const globalEnvKeys = Object.keys(globalEnv).reduce(
-    (prev: GlobalEnvKeys, next: string) => {
-      prev[`process.env.${next}`] = JSON.stringify(globalEnv[next]);
-      return prev;
-    },
-    {},
-  );
-
-  return { globalEnv, globalEnvKeys };
-}
