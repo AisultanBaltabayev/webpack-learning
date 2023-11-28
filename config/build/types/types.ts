@@ -11,10 +11,11 @@ export interface BuildPaths {
 }
 
 export type BuildMode = "production" | "development";
+export type BuildPlatform = "mobile" | "desktop";
 
 export interface BuildOptions extends ScriptEnvVariables {
   globalEnv: GlobalEnvVariables;
-  port: BuildPort;
+  port: GlobalEnvVariables["PORT"];
   paths: BuildPaths;
   isDev: boolean;
   isProd: boolean;

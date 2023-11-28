@@ -1,16 +1,16 @@
-import webpack, { Configuration } from "webpack";
-import HtmlWebpackPlugin from "html-webpack-plugin";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import { BuildOptions } from "./types";
-import { buildGlobalEnvKeys } from "./BuildEnv";
+import webpack, { Configuration } from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { BuildOptions } from './types';
+import { buildGlobalEnvKeys } from './BuildEnv';
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 const BundleAnalyzerPlugin =
-  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-export function buildPlugins(options: BuildOptions): Configuration["plugins"] {
+export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
   const globalEnvKeys = buildGlobalEnvKeys(options.globalEnv);
 
-  const plugins: Configuration["plugins"] = [
+  const plugins: Configuration['plugins'] = [
     // new webpack.DefinePlugin({
     //   "process.env": globalEnv,
     // }),
@@ -27,8 +27,8 @@ export function buildPlugins(options: BuildOptions): Configuration["plugins"] {
   if (options.isProd) {
     plugins.push(
       new MiniCssExtractPlugin({
-        filename: "css/[name].[contenthash:8].css",
-        chunkFilename: "css/[name].[contenthash:8].css",
+        filename: 'css/[name].[contenthash:8].css',
+        chunkFilename: 'css/[name].[contenthash:8].css',
       }),
     );
   }

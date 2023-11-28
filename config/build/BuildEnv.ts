@@ -1,27 +1,65 @@
-import { BuildPaths, GlobalEnvKeys, GlobalEnvVariables } from "./types";
+import {
+  BuildPaths,
+  ExternalEnvVariables,
+  GlobalEnvKeys,
+  GlobalEnvVariables,
+} from './types';
 
-// для получения внешних .env
-export function buildGlobalEnv(envPath: BuildPaths["env"]): GlobalEnvVariables {
-  const dotenv = require("dotenv").config({
+// для получения переменных .env
+export function buildGlobalEnv(
+  envPath: BuildPaths['env'],
+  addExternalEnvVariables: ExternalEnvVariables = {},
+): GlobalEnvVariables {
+  const dotenv = require('dotenv').config({
     path: envPath,
   });
 
-  const globalEnv = dotenv.parsed;
+  const filteredScriptEnvs = removeEmptyParams(addExternalEnvVariables);
+
+  const globalEnv = { ...dotenv.parsed, ...filteredScriptEnvs };
 
   return globalEnv;
 }
 
-// нужны чтобы зарегать env ключи и значения в process.env
+// нужны чтобы зарегать env ключи и значения как глобальные переменные
 export function buildGlobalEnvKeys(
   globalEnv: GlobalEnvVariables,
 ): GlobalEnvKeys {
   const globalEnvKeys = Object.keys(globalEnv).reduce(
     (prev: GlobalEnvKeys, next: keyof GlobalEnvVariables) => {
-      prev[`process.env.${next}`] = JSON.stringify(globalEnv[next]);
+      prev[`__${next}__`] = JSON.stringify(globalEnv[next]);
       return prev;
     },
     {},
   );
 
   return globalEnvKeys;
+}
+
+function removeEmptyParams(params: Record<string, any>): Record<string, any> {
+  if (typeof params !== 'object' || params === null) {
+    // return params;
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(params)
+      .filter(([_, value]) => {
+        if (value === null || value === undefined) {
+          return false;
+        }
+        if (typeof value === 'string' || Array.isArray(value)) {
+          return value.length > 0;
+        }
+        if (typeof value === 'object') {
+          return Object.keys(value).length > 0;
+        }
+        return true;
+      })
+      .map(([key, value]) => [
+        key,
+        // typeof value === 'object' ? removeEmptyParams(value) : value,
+        value,
+      ]),
+  );
 }
