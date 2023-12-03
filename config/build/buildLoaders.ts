@@ -1,11 +1,11 @@
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import { ModuleOptions } from "webpack";
-import { BuildOptions } from "./types";
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { ModuleOptions } from 'webpack';
+import { BuildOptions } from './types';
 
-export function buildLoaders(options: BuildOptions): ModuleOptions["rules"] {
+export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
   const assetLoader = {
     test: /\.(png|jpg|jpeg|gif)$/i,
-    type: "asset/resource",
+    type: 'asset/resource',
   };
 
   // преобразует SVG в React компоненты
@@ -13,13 +13,13 @@ export function buildLoaders(options: BuildOptions): ModuleOptions["rules"] {
     test: /\.svg$/i,
     use: [
       {
-        loader: "@svgr/webpack",
+        loader: '@svgr/webpack',
         options: {
           icon: true,
           svgoConfig: {
             plugins: [
               {
-                name: "convertColors",
+                name: 'convertColors',
                 params: {
                   currentColor: true,
                 },
@@ -32,12 +32,12 @@ export function buildLoaders(options: BuildOptions): ModuleOptions["rules"] {
   };
 
   const cssLoaderWithModules = {
-    loader: "css-loader",
+    loader: 'css-loader',
     options: {
       modules: {
         localIdentName: options.isDev
-          ? "[path][name]__[local]"
-          : "[hash:base64:8]",
+          ? '[path][name]__[local]'
+          : '[hash:base64:8]',
       },
     },
   };
@@ -46,18 +46,30 @@ export function buildLoaders(options: BuildOptions): ModuleOptions["rules"] {
     test: /\.s[ac]ss$/i,
     use: [
       // Creates `style` nodes from JS strings
-      options.isDev ? "style-loader" : MiniCssExtractPlugin.loader,
+      options.isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
       // Translates CSS into CommonJS
       cssLoaderWithModules,
       // Compiles Sass to CSS
-      "sass-loader",
+      'sass-loader',
     ],
   };
 
   const tsLoader = {
     // ts-loader по дефолту умеет работать с JSX
     test: /\.tsx?$/,
-    use: "ts-loader",
+    use: [
+      {
+        loader: 'ts-loader',
+        options: {
+          // Нужно, чтобы отключить/включить проверку типов, самим ts-loader-ом.
+          // Значительно ускоряет компиляцию typescript-а.
+          // Вместо него будем использовать на деве(обсудить) fork-ts-checker-webpack-plugin,
+          // чтобы распараллелить и чекать типы отдельным процессом
+          // transpileOnly: options.isDev,
+          transpileOnly: true,
+        },
+      },
+    ],
     exclude: /node_modules/,
   };
 

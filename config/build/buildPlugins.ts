@@ -3,6 +3,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { BuildOptions } from './types';
 import { buildGlobalEnvKeys } from './BuildEnv';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 const BundleAnalyzerPlugin =
   require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -22,6 +23,10 @@ export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
 
   if (options.isDev) {
     plugins.push(new webpack.ProgressPlugin());
+    plugins.push(
+      // выносит проверку типов в отдельный процесс, не нагружая сборку
+      new ForkTsCheckerWebpackPlugin(),
+    );
   }
 
   if (options.isProd) {
