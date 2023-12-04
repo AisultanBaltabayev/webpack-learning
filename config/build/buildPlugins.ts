@@ -7,6 +7,7 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 const BundleAnalyzerPlugin =
   require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
 export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
   const globalEnvKeys = buildGlobalEnvKeys(options.globalEnv);
@@ -27,6 +28,8 @@ export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
       // выносит проверку типов в отдельный процесс, не нагружая сборку
       new ForkTsCheckerWebpackPlugin(),
     );
+    // Плагин для работы hot-module-replacement-а с фреймворками
+    plugins.push(new ReactRefreshWebpackPlugin());
   }
 
   if (options.isProd) {

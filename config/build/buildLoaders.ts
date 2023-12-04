@@ -1,8 +1,11 @@
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { ModuleOptions } from 'webpack';
 import { BuildOptions } from './types';
+import ReactRefreshTypeScript from 'react-refresh-typescript';
 
 export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
+  const { isDev } = options;
+
   const assetLoader = {
     test: /\.(png|jpg|jpeg|gif)$/i,
     type: 'asset/resource',
@@ -35,9 +38,7 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     loader: 'css-loader',
     options: {
       modules: {
-        localIdentName: options.isDev
-          ? '[path][name]__[local]'
-          : '[hash:base64:8]',
+        localIdentName: isDev ? '[path][name]__[local]' : '[hash:base64:8]',
       },
     },
   };
@@ -46,7 +47,7 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     test: /\.s[ac]ss$/i,
     use: [
       // Creates `style` nodes from JS strings
-      options.isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+      isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
       // Translates CSS into CommonJS
       cssLoaderWithModules,
       // Compiles Sass to CSS
@@ -65,8 +66,13 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
           // Значительно ускоряет компиляцию typescript-а.
           // Вместо него будем использовать на деве(обсудить) fork-ts-checker-webpack-plugin,
           // чтобы распараллелить и чекать типы отдельным процессом
-          // transpileOnly: options.isDev,
+          // transpileOnly: isDev,
           transpileOnly: true,
+          // Опция для работы hot-module-replacement-а с фреймворками
+          // (ts-loader не работает с hmr, если transpileOnly: true. Для этого и используем fork-ts-checker-webpack-plugin)
+          getCustomTransformers: () => ({
+            before: [isDev && ReactRefreshTypeScript()].filter(Boolean),
+          }),
         },
       },
     ],
