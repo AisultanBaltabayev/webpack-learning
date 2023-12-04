@@ -30,8 +30,8 @@ const App = (props: AppProps) => {
   }
 
   return (
-    <div>
-      <div>
+    <div data-test-id={'App.DataTestID'}>
+      <div data-testid={'App.DataTestIDImage'}>
         <img width={100} height={100} src={avatarPng} alt="Avatar-png" />
         <img width={100} height={100} src={avatarJpg} alt="Avatar-jpg" />
       </div>

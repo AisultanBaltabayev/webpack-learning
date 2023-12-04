@@ -31,15 +31,11 @@ export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
   if (options.isDev) {
     plugins.push(new webpack.ProgressPlugin());
 
-    plugins.push(
-      // выносит проверку типов в отдельный процесс, не нагружая сборку
-      new ForkTsCheckerWebpackPlugin(),
-    );
+    // выносит проверку типов в отдельный процесс, не нагружая сборку
+    plugins.push(new ForkTsCheckerWebpackPlugin());
 
-    plugins.push(
-      // Плагин для работы hot-module-replacement-а с фреймворками
-      new ReactRefreshWebpackPlugin(),
-    );
+    // Плагин для работы hot-module-replacement-а с фреймворками
+    plugins.push(new ReactRefreshWebpackPlugin());
   }
 
   if (options.isProd) {

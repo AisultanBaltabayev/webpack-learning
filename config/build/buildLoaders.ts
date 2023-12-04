@@ -2,6 +2,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { ModuleOptions } from 'webpack';
 import { BuildOptions } from './types';
 import ReactRefreshTypeScript from 'react-refresh-typescript';
+import { buildBabelLoader } from './babel/buildBabelLoader';
 
 export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
   const { isDev } = options;
@@ -79,27 +80,7 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     exclude: /node_modules/,
   };
 
-  const babelLoader = {
-    test: /\.tsx?$/,
-    exclude: /node_modules/,
-    use: {
-      loader: 'babel-loader',
-      // если нужен отдельный общий конфиг например для jest итд,
-      // то нужно создавать в корне babel.config.json файлик
-      options: {
-        presets: [
-          '@babel/preset-env',
-          [
-            '@babel/preset-react',
-            {
-              runtime: isDev ? 'automatic' : 'classic',
-            },
-          ],
-          '@babel/preset-typescript',
-        ],
-      },
-    },
-  };
+  const babelLoader = buildBabelLoader(options);
 
   return [
     assetLoader,
