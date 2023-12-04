@@ -79,5 +79,33 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     exclude: /node_modules/,
   };
 
-  return [assetLoader, svgrLoader, scssLoader, tsLoader];
+  const babelLoader = {
+    test: /\.tsx?$/,
+    exclude: /node_modules/,
+    use: {
+      loader: 'babel-loader',
+      // если нужен отдельный общий конфиг например для jest итд,
+      // то нужно создавать в корне babel.config.json файлик
+      options: {
+        presets: [
+          '@babel/preset-env',
+          [
+            '@babel/preset-react',
+            {
+              runtime: isDev ? 'automatic' : 'classic',
+            },
+          ],
+          '@babel/preset-typescript',
+        ],
+      },
+    },
+  };
+
+  return [
+    assetLoader,
+    svgrLoader,
+    scssLoader,
+    // tsLoader,
+    babelLoader,
+  ];
 }
